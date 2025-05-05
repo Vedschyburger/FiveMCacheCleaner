@@ -17,7 +17,7 @@
 # To make the script work, you must enter the following in the path C:\Users\vedsc\AppData\Local\FiveM\FiveM.app\data\ enter your user instead of Administrator
 # If folders are missing, a corresponding message is displayed.
 # If FiveM is not installed on the C: hard disk, the path must be adjusted accordingly.
-# You also need this program to convert the script into an .exe. ->  https://winfuture.de/downloadvorschalt,4029.html
+# You also need the exe. Conversion program which is located in the path PS2EXE-GUI_0.5.0.31. There you simply run the exe. File. Then a program opens and you can convert the program into an exe. File.
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Path to the folders to be deleted
