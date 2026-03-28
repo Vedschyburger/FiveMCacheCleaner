@@ -1,13 +1,6 @@
 <#
 .SYNOPSIS
     FiveM Cache Cleaner (Neon Edition)
-    
-.DESCRIPTION
-    Bereinigt FiveM-Caches mit modernem Neon-UI.
-    Design: Rounded Corners, Neon Pink & Cyber Blue.
-    
-.AUTHOR
-    Vedschyburger
 #>
 
 $ErrorActionPreference = "SilentlyContinue"
@@ -53,7 +46,7 @@ try {
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Margin="0,0,0,20" HorizontalAlignment="Center">
-                <TextBlock Name="HeaderTxt" Text="★ SYSTEM OVERRIDE ★" FontSize="28" FontWeight="ExtraBold" Foreground="#00FFFF" FontFamily="Segoe UI Semibold" TextAlignment="Center">
+                <TextBlock Name="HeaderTxt" Text="SYSTEM OVERRIDE" FontSize="28" FontWeight="ExtraBold" Foreground="#00FFFF" FontFamily="Segoe UI Semibold" TextAlignment="Center">
                     <TextBlock.Effect>
                         <DropShadowEffect Color="#00FFFF" BlurRadius="10" ShadowDepth="0"/>
                     </TextBlock.Effect>
@@ -67,7 +60,7 @@ try {
 
             <Border Grid.Row="1" Background="#151515" CornerRadius="15" Padding="20">
                 <StackPanel>
-                    <TextBlock Name="WarningTitleTxt" Text="⚠️ DATA PURGE INITIALIZED" FontSize="16" FontWeight="Bold" Foreground="#FF00FF" Margin="0,0,0,10"/>
+                    <TextBlock Name="WarningTitleTxt" Text="DATA PURGE INITIALIZED" FontSize="16" FontWeight="Bold" Foreground="#FF00FF" Margin="0,0,0,10"/>
                     <TextBlock Name="WarningBodyTxt" Foreground="#FFFFFF" FontSize="14" TextWrapping="Wrap" LineHeight="22">
                         System cache detected as fragmented. Initializing protocol to wipe 'cache', 'server-cache' and 'priv' directories. FiveM will reboot post-execution.
                     </TextBlock>
@@ -79,9 +72,7 @@ try {
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
                 <Button Name="LangBtn" Grid.Column="0" Width="110" Height="40" Background="#1A1A1A" Foreground="#00FFFF" BorderBrush="#00FFFF" BorderThickness="1" FontSize="12" Cursor="Hand" Content="🌐 DEUTSCH"/>
-
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Name="CancelBtn" Width="110" Height="40" Background="Transparent" Foreground="#666666" BorderThickness="0" FontSize="13" FontWeight="Bold" Cursor="Hand" Content="ABORT"/>
                     <Button Name="OkBtn" Width="200" Height="40" Margin="15,0,0,0" Background="#FF00FF" Foreground="#FFFFFF" BorderThickness="0" FontSize="14" FontWeight="Black" Cursor="Hand" Content="EXECUTE CLEANUP">
@@ -98,7 +89,6 @@ try {
 
     $reader = [System.Xml.XmlReader]::Create((New-Object System.IO.StringReader($xaml)))
     $window = [Windows.Markup.XamlReader]::Load($reader)
-
     $window.Add_MouseLeftButtonDown({ $window.DragMove() })
 
     $headerTxt = $window.FindName("HeaderTxt")
@@ -109,25 +99,16 @@ try {
     $cancelBtn = $window.FindName("CancelBtn")
 
     $script:isEnglish = $true
-
     $langBtn.Add_Click({
             if ($script:isEnglish) {
-                $headerTxt.Text = "★ SYSTEM-ÜBERSCHREIBUNG ★"
-                $warningTitleTxt.Text = "⚠️ DATENBEREINIGUNG GESTARTET"
+                $headerTxt.Text = "SYSTEM-ÜBERSCHREIBUNG"; $warningTitleTxt.Text = "DATENBEREINIGUNG GESTARTET"
                 $warningBodyTxt.Text = "System-Cache Fragmente erkannt. Protokoll zum Löschen der Verzeichnisse 'cache', 'server-cache' und 'priv' wird ausgeführt. FiveM startet nach Abschluss neu."
-                $okBtn.Content = "CLEANUP AUSFÜHREN"
-                $cancelBtn.Content = "ABBRECHEN"
-                $langBtn.Content = "🌐 ENGLISH"
-                $script:isEnglish = $false
+                $okBtn.Content = "CLEANUP AUSFÜHREN"; $cancelBtn.Content = "ABBRECHEN"; $langBtn.Content = "🌐 ENGLISH"; $script:isEnglish = $false
             }
             else {
-                $headerTxt.Text = "★ SYSTEM OVERRIDE ★"
-                $warningTitleTxt.Text = "⚠️ DATA PURGE INITIALIZED"
+                $headerTxt.Text = "SYSTEM OVERRIDE"; $warningTitleTxt.Text = "DATA PURGE INITIALIZED"
                 $warningBodyTxt.Text = "System cache detected as fragmented. Initializing protocol to wipe 'cache', 'server-cache' and 'priv' directories. FiveM will reboot post-execution."
-                $okBtn.Content = "EXECUTE CLEANUP"
-                $cancelBtn.Content = "ABORT"
-                $langBtn.Content = "🌐 DEUTSCH"
-                $script:isEnglish = $true
+                $okBtn.Content = "EXECUTE CLEANUP"; $cancelBtn.Content = "ABORT"; $langBtn.Content = "🌐 DEUTSCH"; $script:isEnglish = $true
             }
         })
 
@@ -138,17 +119,26 @@ try {
 }
 catch { exit }
 
-# --- Execution Logic (FiveM) ---
+# --- Execution ---
 Get-Process "FiveM", "CitizenFX", "CefSharp.BrowserSubprocess" | Stop-Process -Force
-Start-Sleep -Milliseconds 800
+Start-Sleep -Milliseconds 1000
 
-$BaseDataPath = Join-Path $env:LOCALAPPDATA "FiveM\FiveM.app\data"
+$FiveMPath = Join-Path $env:LOCALAPPDATA "FiveM"
+$DataPath = Join-Path $FiveMPath "FiveM.app\data"
+
 "cache", "server-cache", "server-cache-priv" | ForEach-Object {
-    $p = Join-Path $BaseDataPath $_
+    $p = Join-Path $DataPath $_
     if (Test-Path $p) { Remove-Item $p -Recurse -Force }
 }
 
-$lnk = Get-ChildItem "$env:APPDATA\Microsoft\Windows\Start Menu\Programs", "$env:ProgramData\Microsoft\Windows\Start Menu\Programs" -Filter "*FiveM*.lnk" -Recurse | Select-Object -First 1
-if ($lnk) { Start-Process $lnk.FullName }
+# Gezielter Start von FiveM (verhindert das Öffnen von Dev-Tools)
+$ExePath = Join-Path $FiveMPath "FiveM.exe"
+if (Test-Path $ExePath) {
+    Start-Process $ExePath
+}
+else {
+    $lnk = Get-ChildItem "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\FiveM.lnk", "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\FiveM.lnk" | Select-Object -First 1
+    if ($lnk) { Start-Process $lnk.FullName }
+}
 
 exit
